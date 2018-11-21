@@ -11,6 +11,8 @@ function Endure(dataName, path) {
             console.log(`File '${dataName}.json' created.`);
         } catch (e) {}
 
+        // I don't fully understand this handler. I got it from StackOverflow:
+        // https://stackoverflow.com/questions/41299642/#50723478
         const handler = {
             get(target, key) {
                 if (key == 'isProxy') {
