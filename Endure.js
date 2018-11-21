@@ -1,28 +1,47 @@
 function Endure(dataName, path) {
-    const fs = require("fs");
+    dataName = dataName || "endure-data";
     path = path || "";
+
+    const fs = require("fs");
+    const dataPath = `${__dirname}/${path}${dataName}.json`;
 
     function init() {
         try {
-            fs.writeFileSync(`${__dirname}/${path}${dataName}.json`, '{}', {flag: 'wx'});
-            console.log("File '${dataName}.json' created.");
+            fs.writeFileSync(dataPath, '{}', {flag: 'wx'});
+            console.log(`File '${dataName}.json' created.`);
         } catch (e) {}
 
-        const data = JSON.parse(fs.readFileSync(`${__dirname}/../docs.json`).toString());
+        const handler = {
+            get(target, key) {
+                if (key == 'isProxy') {
+                    return true;
+                }
 
-        return new Proxy(data, {
-            set(obj) {
-                fs.writeFile(
-                    `${__dirname}/${path}${dataName}.json`,
-                    JSON.stringify(data), (err) => {
-                        if (err) {
-                            console.log(err);
-                        }
+                const prop = target[key];
+                if (typeof prop == 'undefined') {
+                    return;
+                }
+
+                if (!prop.isBindingProxy && typeof prop === 'object') {
+                    target[key] = new Proxy(prop, handler);
+                }
+                return target[key];
+            },
+            set(target, key, value) {
+                target[key] = value;
+                fs.writeFile(dataPath, JSON.stringify(data), function (err) {
+                    if (err) {
+                        console.log(err);
                     }
-                );
+                });
+                return true;
             }
-        });
+        };
+
+        const data = JSON.parse(fs.readFileSync(dataPath).toString());
+        return new Proxy(data, handler);
     }
+    return init();
 }
 
 module.exports = Endure;
