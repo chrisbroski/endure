@@ -1,13 +1,17 @@
-function Endure(dataName, path) {
+/*jshint esversion: 6 */
+function Endure(dataName, initial, path, indent) {
     dataName = dataName || "endure-data";
+    initial = initial || {};
     path = path || "";
+    indent = indent || "";
 
     const fs = require("fs");
     const dataPath = `${__dirname}/${path}${dataName}.json`;
+    var saveTimer;
 
     function init() {
         try {
-            fs.writeFileSync(dataPath, '{}', {flag: 'wx'});
+            fs.writeFileSync(dataPath, JSON.stringify(initial, null, indent), {flag: 'wx'});
             console.log(`File '${dataName}.json' created.`);
         } catch (e) {}
 
@@ -31,11 +35,21 @@ function Endure(dataName, path) {
             },
             set(target, key, value) {
                 target[key] = value;
-                fs.writeFile(dataPath, JSON.stringify(data), function (err) {
-                    if (err) {
-                        console.log(err);
-                    }
-                });
+                if (!saveTimer) {
+                    saveTimer = setTimeout(function () {
+                        saveTimer = null;
+                        const strData = JSON.stringify(data, null, indent);
+                        if (strData.length > 5000000) {
+                            console.log("Data > 5MB. Not saved");
+                            return;
+                        }
+                        fs.writeFile(dataPath, strData, function (err) {
+                            if (err) {
+                                console.log(err);
+                            }
+                        });
+                    }, 2000);
+                }
                 return true;
             }
         };

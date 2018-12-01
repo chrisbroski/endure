@@ -1,10 +1,8 @@
+/*jshint esversion: 6 */
 const Endure = require("./Endure");
 const http = require('http');
 const querystring = require('querystring');
-const data = new Endure();
-if (!data.array) {
-    data.array = [];
-}
+const data = new Endure(null, {array: []});
 
 function htmlForm(data) {
     return `<!doctype html>
@@ -40,6 +38,7 @@ function routeMethods(req, rsp, body) {
                 return;
             }
             if (requestBody["key"] && requestBody["val"]) {
+                console.log(requestBody.key, requestBody.val);
                 data[requestBody.key] = requestBody.val;
                 rsp.writeHead(200, {'Content-Type': 'text/plain'});
                 rsp.end(`Update key '${requestBody.key}' to '${requestBody.val}'.`);
