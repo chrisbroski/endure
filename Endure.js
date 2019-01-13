@@ -51,6 +51,22 @@ function Endure(dataName, initial, path, indent) {
                     }, 2000);
                 }
                 return true;
+            },
+            deleteProperty(target, key) {
+                if (key in target) {
+                    delete target[key];
+                    if (!saveTimer) {
+                        saveTimer = setTimeout(function () {
+                            saveTimer = null;
+                            const strData = JSON.stringify(data, null, indent);
+                            fs.writeFile(dataPath, strData, function (err) {
+                                if (err) {
+                                    console.log(err);
+                                }
+                            });
+                        }, 2000);
+                    }
+                }
             }
         };
 
