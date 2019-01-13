@@ -9,6 +9,24 @@ function Endure(dataName, initial, path, indent) {
     const dataPath = `${__dirname}/${path}${dataName}.json`;
     var saveTimer;
 
+    function save(data, maxSize) {
+        if (!saveTimer) {
+            saveTimer = setTimeout(function () {
+                saveTimer = null;
+                const strData = JSON.stringify(data, null, indent);
+                if (maxSize && strData.length > maxSize) {
+                    console.log("Data > 5MB. Not saved");
+                    return;
+                }
+                fs.writeFile(dataPath, strData, function (err) {
+                    if (err) {
+                        console.log(err);
+                    }
+                });
+            }, 2000);
+        }
+    }
+
     function init() {
         try {
             fs.writeFileSync(dataPath, JSON.stringify(initial, null, indent), {flag: 'wx'});
@@ -35,37 +53,13 @@ function Endure(dataName, initial, path, indent) {
             },
             set(target, key, value) {
                 target[key] = value;
-                if (!saveTimer) {
-                    saveTimer = setTimeout(function () {
-                        saveTimer = null;
-                        const strData = JSON.stringify(data, null, indent);
-                        if (strData.length > 5000000) {
-                            console.log("Data > 5MB. Not saved");
-                            return;
-                        }
-                        fs.writeFile(dataPath, strData, function (err) {
-                            if (err) {
-                                console.log(err);
-                            }
-                        });
-                    }, 2000);
-                }
+                save(data, 5000000);
                 return true;
             },
             deleteProperty(target, key) {
                 if (key in target) {
                     delete target[key];
-                    if (!saveTimer) {
-                        saveTimer = setTimeout(function () {
-                            saveTimer = null;
-                            const strData = JSON.stringify(data, null, indent);
-                            fs.writeFile(dataPath, strData, function (err) {
-                                if (err) {
-                                    console.log(err);
-                                }
-                            });
-                        }, 2000);
-                    }
+                    save(data);
                 }
             }
         };
