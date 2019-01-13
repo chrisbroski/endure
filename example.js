@@ -37,7 +37,7 @@ function routeMethods(req, rsp, body) {
                 rsp.end(`Added data '${requestBody["array-push"]}' to array.`);
                 return;
             }
-            if (requestBody["key"] && requestBody["val"]) {
+            if (requestBody.key && requestBody.val) {
                 console.log(requestBody.key, requestBody.val);
                 data[requestBody.key] = requestBody.val;
                 rsp.writeHead(200, {'Content-Type': 'text/plain'});
