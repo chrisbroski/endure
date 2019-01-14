@@ -13,38 +13,47 @@ function newId() {
 
 function htmlForm(id, surname, givenName, email, method) {
     method = method || "POST";
-    var buttonVerb = "Add";
+    var buttonVerb = "Add New";
     if (method === "PUT") {
-        buttonVerb = "Update";
+        buttonVerb = "Update Existing";
     }
-    return `<form method="POST" action="">
-    <p><label>First Name <input name="givenName" value="${givenName}" maxlength="255"></label>
-    <p><label>Last Name <input name="surname" value="${surname}" maxlength="255"></label>
-    <p><label>Email <input name="email" value="${email}" maxlength="255"></label>
+    return `
+<form method="POST" action="">
+    <p><label>First Name<br><input name="givenName" value="${givenName}" maxlength="255"></label>
+    <p><label>Last Name<br><input name="surname" value="${surname}" maxlength="255"></label>
+    <p><label>Email<br><input name="email" value="${email}" maxlength="255"></label>
     <p><button>${buttonVerb} Customer</button>
         <input type="hidden" name="id" value="${id}">
         <input type="hidden" name="method" value="${method}">
-</form>`;
+</form>
+`;
 }
 
 function deleteForm(id) {
-    return `<form method="POST" action="">
+    return `
+<form method="POST" action="">
     <p><button>Delete Customer</button>
         <input type="hidden" name="id" value="${id}">
         <input type="hidden" name="method" value="DELETE">
-</form>`;
+</form>
+`;
 }
 
 function customerList(custData) {
     const custIds = Object.keys(custData), custUl = [];
 
     custIds.forEach(function (cust) {
-        custUl.push(`<li>
-    <a href="/${cust}">${custData[cust].surname}, ${custData[cust].givenName}</a>
-    ${custData[cust].email}
-</li>`);
+        custUl.push(`
+    <li>
+        <a href="/${cust}">${custData[cust].surname}, ${custData[cust].givenName}</a>
+        ${custData[cust].email}
+        ${(new Date(custData[cust].created)).toLocaleString()}
+    </li>`);
     });
-    return "<ul>" + custUl.join("\n") + "</ul>";
+    return `
+<ul>${custUl.join("\n")}
+</ul>
+`;
 }
 
 function badRequest(rsp, msg, status) {
@@ -54,6 +63,7 @@ function badRequest(rsp, msg, status) {
 }
 
 function cleanStr(str, maxlength) {
+    str = str || "";
     str = str.trim();
     maxlength = maxlength || 255;
     if (str.length > maxlength) {
@@ -80,14 +90,14 @@ function getCustomer(req, rsp) {
     }
 
     if (req.headers.accept === 'application/json') {
-        rsp.writeHead(200, {'Content-Type': 'application/json'});
+        rsp.writeHead(200, {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'});
         rsp.end(JSON.stringify(getData, null, "    "));
     } else {
-        rsp.writeHead(200, {'Content-Type': 'text/html'});
-        rsp.end(`<!doctype html><title>Customers</title>
-            ${form}
-            ${form2}
-            ${list}
+        rsp.writeHead(200, {'Content-Type': 'text/html', 'Access-Control-Allow-Origin': '*'});
+        rsp.end(`<!doctype html>
+<html lang="en-us">
+<title>Customers</title>
+${form}${form2}${list}
 `);
     }
 }
@@ -138,7 +148,7 @@ function addCustomer(req, rsp, formData) {
     cust.email = cleanStr(formData.email);
     data[id] = cust;
 
-    rsp.writeHead(201, {'Content-Type': 'text/plain', 'Location': '/' + id});
+    rsp.writeHead(201, {'Content-Type': 'text/plain', 'Location': '/' + id, 'Access-Control-Allow-Origin': '*'});
     rsp.end(`Added customer ${id}.`);
 }
 
