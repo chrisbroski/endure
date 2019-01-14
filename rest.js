@@ -18,9 +18,9 @@ function htmlForm(id, surname, givenName, email, method) {
         buttonVerb = "Update";
     }
     return `<form method="POST" action="">
-    <p><label>First Name <input name="surname" value="${surname}"></label>
-    <p><label>Last Name <input name="givenName" value="${givenName}"></label>
-    <p><label>Email <input name="email" value="${email}"></label>
+    <p><label>First Name <input name="givenName" value="${givenName}" maxlength="255"></label>
+    <p><label>Last Name <input name="surname" value="${surname}" maxlength="255"></label>
+    <p><label>Email <input name="email" value="${email}" maxlength="255"></label>
     <p><button>${buttonVerb} Customer</button>
         <input type="hidden" name="id" value="${id}">
         <input type="hidden" name="method" value="${method}">
