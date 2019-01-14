@@ -58,7 +58,7 @@ function customerList(custData) {
 
 function badRequest(rsp, msg, status) {
     status = status || 400;
-    rsp.writeHead(status, {'Content-Type': 'text/plain'});
+    rsp.writeHead(status, {'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*'});
     rsp.end(msg);
 }
 
@@ -166,7 +166,7 @@ function editCustomer(req, rsp, formData) {
     data[id].givenName = formData.givenName;
     data[id].email = formData.email;
 
-    rsp.writeHead(200, {'Content-Type': 'text/plain'});
+    rsp.writeHead(200, {'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*'});
     rsp.end(`Updated customer ${id}.`);
 }
 
@@ -176,7 +176,7 @@ function deleteCustomer(req, rsp) {
         return badRequest(rsp, "ID doesn't exist.", 400);
     }
     delete data[id];
-    rsp.writeHead(200, {'Content-Type': 'text/plain'});
+    rsp.writeHead(200, {'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*'});
     rsp.end(`Deleted customer ${id}.`);
 }
 
@@ -217,7 +217,7 @@ function routeMethods(req, rsp, body) {
         return;
     }
 
-    rsp.writeHead(405, {'Content-Type': 'text/plain'});
+    rsp.writeHead(405, {'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*'});
     rsp.end(`Method "${req.method}" not allowed.`);
 }
 
