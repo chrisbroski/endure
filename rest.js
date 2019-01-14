@@ -36,10 +36,13 @@ function deleteForm(id) {
 }
 
 function customerList(custData) {
-    var custIds = Object.keys(custData), custUl = [];
+    const custIds = Object.keys(custData), custUl = [];
 
     custIds.forEach(function (cust) {
-        custUl.push(`<li><a href="/${cust}">${custData[cust].surname}, ${custData[cust].givenName}</a> ${custData[cust].email}</li>`);
+        custUl.push(`<li>
+    <a href="/${cust}">${custData[cust].surname}, ${custData[cust].givenName}</a>
+    ${custData[cust].email}
+</li>`);
     });
     return "<ul>" + custUl.join("\n") + "</ul>";
 }
@@ -48,17 +51,6 @@ function badRequest(rsp, msg, status) {
     status = status || 400;
     rsp.writeHead(status, {'Content-Type': 'text/plain'});
     rsp.end(msg);
-}
-
-function emailExists(email, id) {
-    var keys = Object.keys(data), ii, len = keys.length;
-
-    for (ii = 0; ii < len; ii += 1) {
-        if (data[keys[ii]].email === email && keys[ii] !== id) {
-            return true;
-        }
-    }
-    return false;
 }
 
 function cleanStr(str, maxlength) {
@@ -73,12 +65,12 @@ function cleanStr(str, maxlength) {
 function getCustomer(req, rsp) {
     var id, getData, form, form2 = "", list = "";
 
-    if (req.url === "/") {
+    if (req.url.slice(-1) === "/") {
         getData = data;
         form = htmlForm("", "", "", "");
         list = customerList(getData);
     } else {
-        id = req.url.slice(1);
+        id = req.url.slice(req.url.lastIndexOf("/") + 1);
         getData = data[id];
         if (!getData) {
             return badRequest(rsp, "Customer not found.", 404);
@@ -98,6 +90,18 @@ function getCustomer(req, rsp) {
             ${list}
 `);
     }
+}
+
+function emailExists(email, id) {
+    const keys = Object.keys(data);
+    const len = keys.length;
+
+    for (let ii = 0; ii < len; ii += 1) {
+        if (data[keys[ii]].email === email && keys[ii] !== id) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function validCustomer(rsp, formData) {
@@ -134,7 +138,7 @@ function addCustomer(req, rsp, formData) {
     cust.email = cleanStr(formData.email);
     data[id] = cust;
 
-    rsp.writeHead(201, {'Content-Type': 'text/plain'});
+    rsp.writeHead(201, {'Content-Type': 'text/plain', 'Location': '/' + id});
     rsp.end(`Added customer ${id}.`);
 }
 
