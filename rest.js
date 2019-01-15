@@ -11,6 +11,10 @@ function newId() {
     return id.replace(/\+/g, "-").replace(/\//g, "_").replace(/\=/, ".");
 }
 
+function serverAddress(req) {
+    return req.headers.host + req.url;
+}
+
 function htmlForm(id, surname, givenName, email, method) {
     method = method || "POST";
     var buttonVerb = "Add New";

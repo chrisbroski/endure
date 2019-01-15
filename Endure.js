@@ -6,7 +6,7 @@ function Endure(dataName, initial, path, indent) {
     indent = indent || "";
 
     const fs = require("fs");
-    const dataPath = `${__dirname}/${path}${dataName}.json`;
+    const dataPath = `${path}${dataName}.json`;
     var saveTimer;
 
     function save(data, maxSize) {
